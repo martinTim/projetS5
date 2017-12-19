@@ -68,11 +68,10 @@ uint32_t read_register(registers r, uint8_t reg) {
 }
 
 uint32_t read_usr_register(registers r, uint8_t reg) {
-    uint32_t value=0;
-    if(! in_a_privileged_mode(reg)){
+    if(! in_a_privileged_mode(r)){
       return r->R[reg];
     }else{
-      exit;
+      return -1;
     }
 }
 
@@ -83,6 +82,8 @@ uint32_t read_cpsr(registers r) {
 uint32_t read_spsr(registers r) {
   if(current_mode_has_spsr(r)){
       return r->R[17];
+  }else{
+    return -1;
   }
 }
 
@@ -91,10 +92,8 @@ void write_register(registers r, uint8_t reg, uint32_t value) {
 }
 
 void write_usr_register(registers r, uint8_t reg, uint32_t value) {
-  if(! in_a_privileged_mode(reg)){
+  if(! in_a_privileged_mode(r)){
     r->R[reg] = value;
-  }else{
-    exit;
   }
 }
 

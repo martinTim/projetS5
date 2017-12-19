@@ -21,25 +21,28 @@ Contact: Guillaume.Huard@imag.fr
 	 38401 Saint Martin d'H�res
 */
 #include <stdlib.h>
+#include <stdio.h>
+
 #include "memory.h"
 #include "util.h"
 
 struct memory_data {
-  uint32_t *memoire;
+  uint8_t *memoire;
   size_t size;
   int is_big_endian;
 };
 
 memory memory_create(size_t size, int is_big_endian) {
-    memory mem= malloc(sizeof(memory));
+    memory mem = malloc(sizeof(memory));
     if(mem){
-      mem->memoire = malloc(size*sizeof(uint32_t));
+      mem->memoire = malloc(size*sizeof(uint8_t));
       mem->size = size;
       mem->is_big_endian = is_big_endian;
       return mem;
     }else{
-      exit;
+      return NULL;
     }
+
 }
 
 size_t memory_get_size(memory mem) {
@@ -51,9 +54,8 @@ void memory_destroy(memory mem) {
 }
 
 int memory_read_byte(memory mem, uint32_t address, uint8_t *value) {
-    if(mem->memoire + address <=  ( mem->memoire + mem->size - sizeof(uint8_t) ) ) {
-        uint8_t * result = mem->memoire + address;
-        value = result;
+    if(address <=  (mem->size - sizeof(uint8_t) ) ) {
+        *value = mem->memoire[address];
         return 0;
     }else{
       return -1;
@@ -61,14 +63,14 @@ int memory_read_byte(memory mem, uint32_t address, uint8_t *value) {
 }
 
 int memory_read_half(memory mem, uint32_t address, uint16_t *value) {
-  if(mem->memoire + address <=  ( mem->memoire + mem->size - sizeof(uint16_t) ) ) {
-    uint16_t * result;
+  if(mem->size < address - sizeof(uint16_t)) {
+    uint16_t result;
     if( mem->is_big_endian){
-      result = mem->memoire + address;
+      result = mem->memoire[address]<<8 | mem->memoire[address+1];
     }else{
-      result = ((uint16_t)(mem->memoire + address)<<8) | ((uint16_t)(mem->memoire + address)>>8);
+      result = mem->memoire[address+1]<<8 | mem->memoire[address];
     }
-      value = result;
+      *value = result;
       return 0;
   }else{
     return -1;
@@ -77,19 +79,16 @@ int memory_read_half(memory mem, uint32_t address, uint16_t *value) {
 }
 
 int memory_read_word(memory mem, uint32_t address, uint32_t *value) {
-  if(mem->memoire + address <=  ( mem->memoire + mem->size - sizeof(uint32_t) ) ) {
-      uint32_t * result;
+  if(address <=  (mem->size - sizeof(uint32_t) ) ) {
+      uint32_t result;
     if( mem->is_big_endian){
-      result = mem->memoire + address;
+        result = mem->memoire[address]<<24 | mem->memoire[address+1] << 16 |
+         mem->memoire[address+2] << 8  | mem->memoire[address+3] ;
     }else{
-      uint32_t masque = 0x000000FF;
-      uint32_t * tmp = mem->memoire + address;
-     result= (masque & (uint32_t)tmp>>24)
-      + ((masque<<8) & (uint32_t)tmp>>8)
-      + ((masque<<8) & (uint32_t)tmp<<8)
-      + ((masque<<8) & (uint32_t)tmp<< 24);
+      result = mem->memoire[address+3]<<24 | mem->memoire[address+2] << 16 |
+       mem->memoire[address+1] << 8  | mem->memoire[address] ;
     }
-      value = result;
+      *value = result;
       return 0;
   }else{
     return -1;
@@ -97,9 +96,8 @@ int memory_read_word(memory mem, uint32_t address, uint32_t *value) {
 }
 
 int memory_write_byte(memory mem, uint32_t address, uint8_t value) {
-  if(mem->memoire + address <=  ( mem->memoire + mem->size - sizeof(uint8_t) ) ) {
-      uint8_t * result = mem->memoire + address;
-      result = value;
+  if(address <=  (  mem->size - sizeof(uint8_t) ) ) {
+      mem->memoire[address] = value;
       return 0;
   }else{
     return -1;
@@ -107,9 +105,15 @@ int memory_write_byte(memory mem, uint32_t address, uint8_t value) {
 }
 
 int memory_write_half(memory mem, uint32_t address, uint16_t value) {
-  if(mem->memoire + address <=  ( mem->memoire + mem->size - sizeof(uint16_t) ) ) {
-      uint16_t * result = mem->memoire + address;
-      result = value;
+  if(address <=  (mem->size - sizeof(uint16_t) ) ) {
+      
+    if(mem->is_big_endian){
+      value = reverse_2(value);
+      
+    }
+
+      mem->memoire[address+1] = (((value) & 0xFF00)>>8) ;
+      mem->memoire[address] = (value & 0xFF) ;
       return 0;
   }else{
     return -1;
@@ -117,10 +121,17 @@ int memory_write_half(memory mem, uint32_t address, uint16_t value) {
 }
 
 int memory_write_word(memory mem, uint32_t address, uint32_t value) {
-  if(mem->memoire + address <=  ( mem->memoire + mem->size - sizeof(uint32_t) ) ) {
-      uint32_t * result = mem->memoire + address;
-      result = value;
-      return 0;
+  if( address <=  (mem->size - sizeof(uint32_t) ) ) {
+
+
+    if(mem->is_big_endian){
+      value = reverse_4(value);
+    }
+    mem->memoire[address+3] = (value >>24 )& 0xFF ;
+    mem->memoire[address+2] = (value >>16 )& 0xFF ;
+    mem->memoire[address+1] = (value >>8 )& 0xFF ;
+    mem->memoire[address] = (value & 0xFF) ;
+    return 0;
   }else{
     return -1;
   }
