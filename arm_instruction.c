@@ -29,6 +29,56 @@ Contact: Guillaume.Huard@imag.fr
 #include "util.h"
 
 static int arm_execute_instruction(arm_core p) {
+    uint32_t val_instr;
+    int res;
+    res =  arm_fetch(p,&val_instr);
+    if(!res)
+      return -1;
+
+
+    uint8_t code = get_bits(val_instr,27,25);
+    switch(code){
+      case 0b000:
+            
+
+        break;
+      case 0b001:
+
+
+
+        break;
+      case 0b010:
+
+
+
+        break;
+      case 0b011:
+
+
+
+        break;
+      case 0b100:
+
+
+
+        break;
+      case 0b101:
+
+
+
+
+        break;
+      case 0b110:
+
+
+        break;
+      case 0b111:
+
+
+
+        break;
+    }
+
     return 0;
 }
 
@@ -42,7 +92,6 @@ int arm_step(arm_core p) {
 }
 
 int condCode(arm_core p,uint32_t value){
-
     uint8_t opcode = (0xF0000000 & value)>>28;
     uint8_t NZCV = arm_read_cpsr(p)>>28;
     switch (opcode){
@@ -64,5 +113,4 @@ int condCode(arm_core p,uint32_t value){
       case 15:return 0; break; // aucune idée
       default: return -1; break;
     }
-
 }
