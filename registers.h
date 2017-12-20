@@ -42,5 +42,6 @@ void write_register(registers r, uint8_t reg, uint32_t value);
 void write_usr_register(registers r, uint8_t reg, uint32_t value);
 void write_cpsr(registers r, uint32_t value);
 void write_spsr(registers r, uint32_t value);
+int condCode(register r, uint32_t value);
 
 #endif

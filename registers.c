@@ -104,3 +104,46 @@ void write_cpsr(registers r, uint32_t value) {
 void write_spsr(registers r, uint32_t value) {
     r->R[17] = value;
 }
+
+int condCode(register r, uint32_t value){
+    uint8_t opcode = (0xF0000000 & value)>>28;
+    uint8_t NZCV = (0xF0000000 & r->R[16])>>28;
+    switch (opcode){
+      case 0:
+        return (NZCV & 0b0100); break;  // Z set
+      case 1:
+        return !(NZCV & 0b0100); break; // Z clear
+      case 2:
+        return (NZCV & 0b0010); break;  // C set
+      case 3: 
+        return !(NZCV & 0b0010); break; // C clear
+      case 4:
+        return (NZCV & 0b1000); break; // N set
+      case 5:
+        return !(NZCV & 0b1000); break; // N clear
+      case 6:
+        return (NZCV & 0b0001); break; // V set
+      case 7:
+        return !(NZCV & 0b001); break; // V clear
+      case 8:
+        return ((NZCV & 0b0010) && !(NZCV & 0b0100)); break; // C set Z clear
+      case 9:
+        return (!(NZCV & 0b0010) || (NZCV & 0b0100)); break; // C clear or Z set
+      case 10:
+        return (((NZCV & 0b1000)>>3) == (NZCV & 0b0001)) ; break; // N == V
+      case 11:
+        return ((NZCV & 0b1000)^(NZCV & 0b0001)); break; // N != V
+      case 12:
+        return ((((NZCV & 0b1000)>>3) == (NZCV & 0b0001)) && !(NZCV & 0b0100)); break; // Z clear and N == V
+      case 13:
+        return ((NZCV & 0b0100) || (((NZCV & 0b1000)>>3) == (NZCV & 0b0001))); break; 
+      case 14:
+        return 1; break;
+      case 15:
+        return 0;
+      default: return -1; break;
+    }
+
+}
+
+
