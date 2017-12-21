@@ -36,41 +36,34 @@ static int arm_execute_instruction(arm_core p) {
       return -1;
 
 
-    uint8_t code = get_bits(val_instr,27,26);
+    uint8_t code = get_bits(val_instr,27,25);
     switch(code){
-        case 0b00:// traitement de données (data processing) + miscaellniounious
-            uint8_t a = get_bit(val_instr,24);
-            uint8_t i = get_bit(val_instr,25);
-            if(i==0) {
-                if(a==1) {
-                    res = arm_miscellaneous(p,val_instr);
-                }else{
-                    res = arm_data_processing_shift(p,val_instr);
-                }
-            }
-            else if(i==1) {
-                res = arm_data_processing_immediate_msr(p,val_instr);
-            }
-            
-        break;
-      case 0b01:// accèes mémoire (LOAD_STORE)
-
-
-        break;
-      case 0b10:// Branchement (BRANCH)
-
-
-        break;
-      case 0b11:// Divers (OTHERS)
-          
-        break;
+        case 0b000: // traitement données 1
+            res = arm_data_processing_shift(p,val_instr);            
+            break;
+        case 0b001: // traitement données 2
+            res = arm_data_processing_immediate_msr(p,val_instr);
+            break;
+        case 0b010: // mémoire 1
+        case 0b011:
+            res = arm_load_store(p,val_instr);
+            break;
+        case 0b100:// mémoire 2
+            res = arm_load_store_multiple(p,val_instr);
+            break;
+        case 0b101: // branchement
+            res = arm_branch(p,val_instr);
+            break;
+        case 0b110: // divers
+            res = arm_coprocessor_load_store(p,val_instr);
+            break;
+        case 0b111: // divers SWI
+            res = arm_coprocessor_others_swi(p,val_instr);
+            break;
         default : 
             res = -1;
             break;
     }
-    
-    
-
     return res;
 }
 
