@@ -29,6 +29,61 @@ Contact: Guillaume.Huard@imag.fr
 
 /* Decoding functions for different classes of instructions */
 int arm_data_processing_shift(arm_core p, uint32_t ins) {
+	
+	uint8_t opcode = get_bits(ins,24,21);
+	uint8_t S = get_bit(ins,20);
+	uint8_t Rn = get_bits(ins,19,16);
+	uint32_t rn_val = p->arm_read_register(p,Rn);	
+	uint8_t Rd = get_bits(ins,15,12);
+	uint32_t rd_val;
+	uint8_t S = get_bit(ins,25);
+	int res;
+	
+	switch(opcode){
+		case ADD:
+			uint8_t shift_type = get_bits(ins,6,5);
+			if(get_bit(ins,4)){ // register 
+				uint8_t reg = get_bits(ins,3,0);
+				uint32_t rm  = p->arm_read_register(p,reg);		
+				uint32_t val_shift = p->arm_read_register(p,get_bit(ins,11,8));			
+				res = shift(rm,shift_type,val_shift);
+				if(!res){
+					rd_val = rn_val + Rm;
+					p->arm_write_register(p,Rd,rd_val);
+				}else{
+					return -1;
+				}
+			}else{//immediat
+			
+				uint8_t val_shift = get_bits(ins,3,0);
+			
+			
+				if(!res){
+					rd_val = rn_val + Rm;
+					p->arm_write_register(p,Rd,rd_val);
+				}else{
+					return -1;
+				}			
+			}
+			
+		
+		break;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
     return UNDEFINED_INSTRUCTION;
 }
 

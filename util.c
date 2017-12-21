@@ -23,7 +23,7 @@ Contact: Guillaume.Huard@imag.fr
 #include "util.h"
 
 /* We implement asr because shifting a signed is non portable in ANSI C */
-uint32_t asr(uint32_t value, uint8_t shift) {
+uint32_t asr(uint32_t value, uint8_t shift) { 
     return (value >> shift) | (get_bit(value, 31) ? ~0<<(32-shift) : 0);
 }
 
@@ -34,4 +34,27 @@ uint32_t ror(uint32_t value, uint8_t rotation) {
 int is_big_endian() {
     static uint32_t one = 1;
     return ((* (uint8_t *) &one) == 0);
+}
+
+int shift(uint32_t *rm, uint8_t shift_type, uint32_t val_shift){
+	switch(shift_type){
+		int c =0;
+		case 0: // logical shift left
+			int i;
+			for(i=0;i++;i<val_shift){
+				c+=get_bit(rm,31);
+				rm = rm << 1;
+			}
+			break;
+		case 1: // logical shift right
+			rm = rm >> val_shift;
+			break;
+		case 2:  // arithmetic shift right
+			rm = asr(rm, val_shift);
+			break;
+		case 3: // rotation tight
+			rm = ror(rm, val_shift);
+			break;
+	}
+	return c;
 }
