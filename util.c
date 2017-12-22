@@ -37,8 +37,8 @@ int is_big_endian() {
 }
 
 int shift(uint32_t *rm, uint8_t shift_type, uint32_t val_shift){
-		int c =0;
-		int i;
+	int c = 0;
+	int i;
 	switch(shift_type){
 		case 0: // logical shift left
 			for(i=0;i<val_shift;i++){
