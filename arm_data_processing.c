@@ -27,21 +27,27 @@ Contact: Guillaume.Huard@imag.fr
 #include "util.h"
 #include "debug.h"
 
+/*
+int* operation(uint8_t opcode,uint32_t dest ,uint32_t firstOperand ,uint32_t secondOperand ){
+	int *result = 1;
+	return result;
+}
+*/
 /* Decoding functions for different classes of instructions */
 int arm_data_processing_shift(arm_core p, uint32_t ins) {
 	
 	
-	uint8_t opcode = get_bits(ins,24,21);
+	//uint8_t opcode = get_bits(ins,24,21);
 	uint8_t S = get_bit(ins,20);
-
+	
 
 	//first operand
-	uint8_t Rn = get_bits(ins,19,16);
-	uint32_t rn_val = arm_read_register(p,Rn);	
+	//uint8_t Rn = get_bits(ins,19,16);
+	//uint32_t rn_val = arm_read_register(p,Rn);	
 	
 	//registre de  destination
 	uint8_t Register_destination = get_bits(ins,15,12);
-	uint32_t rd_val;
+	uint32_t rd_val =  arm_read_register(p,Register_destination);	
 
 	//result of function
 	int res;
@@ -72,26 +78,51 @@ int arm_data_processing_shift(arm_core p, uint32_t ins) {
 	}
 
 
-	res = shift(value_To_Shift,shift_type,val_shift);
+	int c = 0;
+	c = shift(&value_To_Shift,shift_type,val_shift);
 
 	//traiter carry shift
 
-
-	res = operation(opcode,rd_val,rn_val,value_To_Shift);// (opcode,dest,fisrtOP,secOp)
-
+	/*int * result_op;
+	result_op = operation(opcode,rd_val,rn_val,value_To_Shift);// (opcode,dest,fisrtOP,secOp)
+	*/
 
 	rd_val =  arm_read_register(p,Register_destination);	
 
 
 	if(S == 1 && rd_val == arm_read_register(p,15)){
-		if( arm_current_mode_has_spsr){//=> CPSR = SPSR
+		if( arm_current_mode_has_spsr(p)){//=> CPSR = SPSR
 			arm_write_register(p,16,arm_read_register(p,17));	
 		}else{
 			res = -1;
 		}
-
-
 	}else if(S == 1){//mise a jours des registres ZNVC
+		uint32_t registre =  arm_read_register(p,16);	
+
+
+		if(get_bit(rd_val,31)){//N
+			registre = set_bit(registre, 31);
+		}
+
+		if(rd_val == 0){//Z
+			registre = set_bit(registre, 30);
+		}else{
+			 registre = clr_bit(registre, 30);
+		}
+		
+		if(c){//C
+			registre = set_bit(registre, 29);
+		}else{
+			registre = clr_bit(registre, 29);
+		}
+
+
+				
+
+
+		//V a faire !!
+
+
 
 
 	}
