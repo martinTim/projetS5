@@ -31,15 +31,20 @@ Contact: Guillaume.Huard@imag.fr
 static int arm_execute_instruction(arm_core p) {
     uint32_t val_instr;
     int res;
+      printf(" test 2 \n" );
     res =  arm_fetch(p,&val_instr);
-    if(!res)
+    if(res != 0 ){
+      printf(" test 4 %d \n", res );
       return -1;
+    }
+
+        printf(" test 3 \n" );
 
 
     uint8_t code = get_bits(val_instr,27,25);
     switch(code){
         case 0b000: // traitement données 1
-            res = arm_data_processing_shift(p,val_instr);            
+            res = arm_data_processing_shift(p,val_instr);
             break;
         case 0b001: // traitement données 2
             res = arm_data_processing_immediate_msr(p,val_instr);
@@ -60,8 +65,8 @@ static int arm_execute_instruction(arm_core p) {
         case 0b111: // divers SWI
             res = arm_coprocessor_others_swi(p,val_instr);
             break;
-        default : 
-            res = -1;
+        default :
+              res = -1;
             break;
     }
     return res;
@@ -69,6 +74,7 @@ static int arm_execute_instruction(arm_core p) {
 
 int arm_step(arm_core p) {
     int result;
+    printf(" test 1 \n" );
 
     result = arm_execute_instruction(p);
     if (result)

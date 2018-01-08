@@ -209,7 +209,7 @@ void arm_print_state(arm_core p, FILE *out) {
                             fprintf(out, "\n    ");
                         fprintf(out, "   %3s=%08X", arm_get_register_name(reg),
                                 arm_read_usr_register(p, reg));
-                } else //if ((p->registers[mode][reg] - p->registers_storage) > 15) 
+                } else //if ((p->registers[mode][reg] - p->registers_storage) > 15)
                        {
                         if ((count > 0) && (count%5 == 0))
                             fprintf(out, "\n    ");
