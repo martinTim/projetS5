@@ -77,9 +77,15 @@ int arm_data_processing_immediate_msr(arm_core p, uint32_t ins) {
 		uint8_t Rn = get_bits(ins,19,16);
 		uint32_t rn_val = arm_read_register(p,Rn);
 		uint8_t Rd = get_bits(ins,15,12);
-		uint8_t immediate_val = get_bits(ins,11,0);
+
+		uint8_t rotate_imm = get_bits(ins,11,8);
+		uint8_t immed_8 = get_bits(ins,7,0);
+		uint32_t shifter_operande  = ror(immed_8, 2 * rotate_imm );
+		
 		uint8_t nzcv = get_bits(arm_read_cpsr(p),31,28);
-		uint32_t res = operation(p,opcode,Rd,rn_val,immediate_val, &nzcv,0);
+
+
+		uint32_t res = operation(p,opcode,Rd,rn_val,shifter_operande, &nzcv,0);
 		if(res){
 			if((S == 1) && Rd==15){
 				if(arm_current_mode_has_spsr(p)){
