@@ -16,46 +16,50 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
 �tats-Unis.
 
 Contact: Guillaume.Huard@imag.fr
-	 B�timent IMAG
-	 700 avenue centrale, domaine universitaire
-	 38401 Saint Martin d'H�res
-*/
+         B�timent IMAG
+         700 avenue centrale, domaine universitaire
+         38401 Saint Martin d'H�res
+ */
 #include "arm_branch_other.h"
 #include "arm_constants.h"
 #include "util.h"
+#include "arm_instruction.h"
 #include <debug.h>
 #include <stdlib.h>
 
-
 int arm_branch(arm_core p, uint32_t ins) {
-    uint8_t L = get_bit(ins,24);
-    uint8_t mode = get_mode_registers(p);
-    uint8_t bit = get_bit(ins,23);
-    uint32_t target_address;
-        
-    if(bit) {
-        target_address = 0x3F000000 | get_bits(ins,23,0);
-    }else{
-        target_address = 0x03FFFFFF | get_bits(ins,23,0);
-    }
 
-    target_address = target_address << 2;
-    uint32_t pc = arm_read_register(p,15);
-    pc = pc + target_address;
-    arm_write_register(p,15,pc);
+    if (condCode(p, ins)) {
 
-    // si L
-    if(L==1) {
-        if(mode==USR) {
-            arm_write_usr_register(p,14,pc);
+        uint8_t L = get_bit(ins, 24);
+        uint8_t mode = get_mode_registers(p);
+        uint8_t bit = get_bit(ins, 23);
+        uint32_t target_address;
+        uint32_t pc = arm_read_register(p, 15);
+
+        //In case L=1 we have to preserve the return address
+        if (L == 1) {
+            if (mode == USR) {
+                arm_write_usr_register(p, 14, pc - 0x4);
+            } else if (mode == SYS) {
+                arm_write_register(p, 14, pc - 0x4);
+            } else
+                arm_write_register(p, 14, pc - 0x4); //Apparemment on est dans le mode superviseur
         }
-        else if(mode==SYS) {
-            arm_write_register(p,14,pc);
-        }
-    }
-    // fin si L
 
-    return 1;
+        //Sign extending to 30 bits
+        if (bit) {
+            target_address = 0b111111000000000000000000000000 | get_bits(ins, 23, 0);
+        } else {
+            target_address = 0b000000000000000000000000000000 | get_bits(ins, 23, 0);
+        }
+
+        target_address = target_address << 2;
+        pc = pc + target_address;
+        arm_write_register(p, 15, pc);
+
+        return 1;
+    } else return 1; //Condition not satisfied, no branch done.
 }
 
 int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
@@ -64,7 +68,7 @@ int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
         if ((ins & 0xFFFFFF) == 0x123456)
             exit(0);
         return SOFTWARE_INTERRUPT;
-    } 
+    }
     return UNDEFINED_INSTRUCTION;
 }
 
