@@ -73,13 +73,16 @@ int arm_load_store(arm_core p, uint32_t ins) {
 
         if(b){//LOAD OU STORE 1 octet 
         printf("load / str un octet \n ");
-            //uint8_t data; 
-            if(l){//load
-              
+            uint8_t data; 
 
-               
+            if(l){//load
+                arm_read_byte(p,address,&data);
+                printf(" lo %x  ---- %d\n",address,data);
+                arm_write_register(p,rd,data);
             }else{//store
-        
+                data =  arm_read_register(p,rd);
+                 printf(" st ---- %d\n",data);
+                arm_write_byte(p,address,data);
             }
 
         }else{//LOAD OU STORE 1 MOT
@@ -119,6 +122,9 @@ int arm_load_store(arm_core p, uint32_t ins) {
         if(pBit && w ){
             arm_write_register(p,rn,address);
         }
+
+
+        
 
 
     }
