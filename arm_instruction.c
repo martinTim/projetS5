@@ -38,6 +38,12 @@ static int arm_execute_instruction(arm_core p) {
       return -1;
     }
 
+
+    res = condCode(p,val_instr);
+    if(!res  ){
+        printf(" test error condCode\n" );
+        return -1;
+        }
         printf(" test 3 \n" );
 
 
@@ -86,22 +92,22 @@ int condCode(arm_core p,uint32_t value){
     uint8_t opcode = (0xF0000000 & value)>>28;
     uint8_t NZCV = arm_read_cpsr(p)>>28;
     switch (opcode){
-      case 0: return (NZCV & 0b0100); break;  // Z set
-      case 1: return !(NZCV & 0b0100); break; // Z clear
-      case 2: return (NZCV & 0b0010); break;  // C set
-      case 3: return !(NZCV & 0b0010); break; // C clear
-      case 4: return (NZCV & 0b1000); break; // N set
-      case 5: return !(NZCV & 0b1000); break; // N clear
-      case 6: return (NZCV & 0b0001); break; // V set
-      case 7: return !(NZCV & 0b001); break; // V clear
-      case 8: return ((NZCV & 0b0010) && !(NZCV & 0b0100)); break; // C set Z clear
-      case 9: return (!(NZCV & 0b0010) || (NZCV & 0b0100)); break; // C clear or Z set
-      case 10:return (((NZCV & 0b1000)>>3) == (NZCV & 0b0001)); break; // N == V
-      case 11:return ((NZCV & 0b1000)^(NZCV & 0b0001)); break; // N != V
-      case 12:return ((((NZCV & 0b1000)>>3) == (NZCV & 0b0001)) && !(NZCV & 0b0100)); break; // Z clear and N == V
-      case 13:return ((NZCV & 0b0100) || (((NZCV & 0b1000)>>3) == (NZCV & 0b0001))); break;
-      case 14:return 1; break; // toujours vrai
-      case 15:return -1; break; // aucune idée
-      default: return -1; break;
+      case 0: return (NZCV & 0b0100);   // Z set
+      case 1: return !(NZCV & 0b0100);  // Z clear
+      case 2: return (NZCV & 0b0010);   // C set
+      case 3: return !(NZCV & 0b0010);  // C clear
+      case 4: return (NZCV & 0b1000);  // N set
+      case 5: return !(NZCV & 0b1000);  // N clear
+      case 6: return (NZCV & 0b0001);  // V set
+      case 7: return !(NZCV & 0b001);  // V clear
+      case 8: return ((NZCV & 0b0010) && !(NZCV & 0b0100));  // C set Z clear
+      case 9: return (!(NZCV & 0b0010) || (NZCV & 0b0100));  // C clear or Z set
+      case 10:return (((NZCV & 0b1000)>>3) == (NZCV & 0b0001));  // N == V
+      case 11:return ((NZCV & 0b1000)^(NZCV & 0b0001));  // N != V
+      case 12:return ((((NZCV & 0b1000)>>3) == (NZCV & 0b0001)) && !(NZCV & 0b0100));  // Z clear and N == V
+      case 13:return ((NZCV & 0b0100) || (((NZCV & 0b1000)>>3) == (NZCV & 0b0001))); 
+      case 14:return 1;  // toujours vrai
+      case 15:return -1;  // aucune idée
+      default: return -1; 
     }
 }
