@@ -49,8 +49,11 @@ static int arm_execute_instruction(arm_core p) {
 
     uint8_t code = get_bits(val_instr,27,25);
     switch(code){
-        case 0b000: // traitement données 1
-            res = arm_data_processing_shift(p,val_instr);
+        case 0b000: // traitement données 1 ou LDRH/STRH
+            if(get_bit(val_instr,7)==1 && get_bit(val_instr,4)==1) //LDRH et STRH
+                res = arm_load_store(p,val_instr);
+            else
+                res = arm_data_processing_shift(p,val_instr);
             break;
         case 0b001: // traitement données 2
             res = arm_data_processing_immediate_msr(p,val_instr);
