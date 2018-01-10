@@ -47,11 +47,16 @@ int arm_load_store(arm_core p, uint32_t ins) {
 
     if(!imm_offset && h){// Feuille 1
      printf("load / store test 1 \n");
-        if(!pBit && !w ){
+          printf("load / store test 1 rn : %x \n",rn);
+
+        if(!pBit && !w ){ // 1ER CAS
+            /*if(rn == 16){
+                return UNDEFINED_INSTRUCTION;
+            }*/
             address = rn_val;
         }
 
-        if(u){
+        if(u){ // TOUS LES CAS
             address = rn_val + offset;
         }else{
             address = rn_val - offset;
@@ -59,19 +64,21 @@ int arm_load_store(arm_core p, uint32_t ins) {
       
     //CONDCODE ici
 
-        if(pBit && w ){
+        if(pBit && w ){ // 2EME CAS
+           /* if(rn == 15){
+                return UNDEFINED_INSTRUCTION;
+            }*/
             arm_write_register(p,rn,address);
         }
 
 
-      /*  if(rn == 15 && ( pBit && !w )) {
-            return -1; // UNPREDICTTABLE
-        }
-        }else{
-             address += 8;
-        }
-        */
-
+      /*  if( pBit && !w ) {
+            if(rn == 15){
+                address +=8; // UNPREDICTTABLE           
+            }        
+        }*/
+        
+     
 
     }else{// feuille 2 ET 3
         printf("load / store test 2\n ");
@@ -80,21 +87,39 @@ int arm_load_store(arm_core p, uint32_t ins) {
         uint8_t shift_type = get_bits(ins,6,5);
         uint8_t rm = get_bits(ins,3,0);
         offset = arm_read_register(p,rm);
-        if(!pBit && !w ){
-            address = rn_val;
+        if(!pBit && !w ){ // 1ER CAS
+         /*   if(rn == 15 || rm == 15) {
+               return -1; // UNPREDICTTABLE
+            } */
+            address = rn_val;  
+
         }
 
         shift(&offset,shift_type,val_shift);
 
-        if(u){
+        if(u){ // CAS GENERAL
             address = rn_val + offset;
         }else{
             address = rn_val - offset;
         }
+
+
         //CONDCODE ici
-        if(pBit && w ){
-            arm_write_register(p,rn,address);
+        if(pBit && w ){ // 2EME CAS
+         /*   if(rn == 15 || rm == 15) {
+               return -1; // UNPREDICTTABLE
+            }*/
+            arm_write_register(p,rn,address);   
         }
+
+        /*if( pBit && !w ) { // 3EME CAS
+            if(rm  == 15){
+                return -1; // UNPREDICTTABLE     
+            }
+            if(rn == 15 ){
+                address += 8;
+            }
+        }*/
 
     }
             printf(" offset ---- %x \n",offset);
