@@ -34,6 +34,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
     uint8_t u = get_bit(ins,23);
     uint8_t l = get_bit(ins,20);
     uint8_t b = get_bit(ins,22);
+    uint8_t h = get_bit(ins,26);
 
     uint8_t rn = get_bits(ins,19,16); 
     uint32_t rn_val = arm_read_register(p,rn);
@@ -44,8 +45,8 @@ int arm_load_store(arm_core p, uint32_t ins) {
     printf("load / store \n");
    
 
-    if(!imm_offset){// Feuille 1
-    printf("load / store test 1 \n");
+    if(!imm_offset && h){// Feuille 1
+     printf("load / store test 1 \n");
         if(!pBit && !w ){
             address = rn_val;
         }
@@ -71,33 +72,6 @@ int arm_load_store(arm_core p, uint32_t ins) {
         }
         */
 
-        if(b){//LOAD OU STORE 1 octet 
-        printf("load / str un octet \n ");
-            uint8_t data; 
-
-            if(l){//load
-                arm_read_byte(p,address,&data);
-                printf(" lo %x  ---- %d\n",address,data);
-                arm_write_register(p,rd,data);
-            }else{//store
-                data =  arm_read_register(p,rd);
-                 printf(" st ---- %d\n",data);
-                arm_write_byte(p,address,data);
-            }
-
-        }else{//LOAD OU STORE 1 MOT
-            printf("load / str un mot \n ");
-            uint32_t data;
-            if(l){//load
-                arm_read_word(p,address,&data);
-                arm_write_register(p,rd,data);
-            }else{//store
-                data =  arm_read_register(p,rd);
-                arm_write_word(p,address,data);
-            }
-
-        }
-
 
     }else{// feuille 2 ET 3
         printf("load / store test 2\n ");
@@ -106,7 +80,6 @@ int arm_load_store(arm_core p, uint32_t ins) {
         uint8_t shift_type = get_bits(ins,6,5);
         uint8_t rm = get_bits(ins,3,0);
         offset = arm_read_register(p,rm);
-
         if(!pBit && !w ){
             address = rn_val;
         }
@@ -123,9 +96,46 @@ int arm_load_store(arm_core p, uint32_t ins) {
             arm_write_register(p,rn,address);
         }
 
+    }
+            printf(" offset ---- %x \n",offset);
 
-        
 
+
+    if(!h){//LOAD OUR STORE HALF WORD
+        uint16_t data;
+        printf("load / str un 1/2 mot  \n ");
+        if(l){//load
+            arm_read_half(p,address,&data);
+            arm_write_register(p,rd,data);
+        }else{//store
+            printf(" address ---- %x \n",address);
+            data =  arm_read_register(p,rd);
+            arm_write_half(p,address,data);
+        }
+
+    }else if(b){//LOAD OU STORE 1 octet 
+        printf("load / str un octet \n ");
+        uint8_t data; 
+
+        if(l){//load
+            arm_read_byte(p,address,&data);
+            arm_write_register(p,rd,data);
+        }else{//store
+            data =  arm_read_register(p,rd);
+        //     printf(" st ---- %d\n",data);
+            arm_write_byte(p,address,data);
+        }
+
+    }else{//LOAD OU STORE 1 MOT
+    //    printf("load / str un mot \n ");
+        uint32_t data;
+        if(l){//load
+            arm_read_word(p,address,&data);
+            arm_write_register(p,rd,data);
+        }else{//store
+            data =  arm_read_register(p,rd);
+            arm_write_word(p,address,data);
+        }
 
     }
 
@@ -133,12 +143,99 @@ int arm_load_store(arm_core p, uint32_t ins) {
 }
 
 int arm_load_store_multiple(arm_core p, uint32_t ins) {
-    
 
 
+    uint8_t pBit            = get_bit(ins,24);
+    uint8_t u               = get_bit(ins,23);
+    uint8_t w               = get_bit(ins,21);
+    uint8_t l               = get_bit(ins,20);
+    uint8_t rn              = get_bits(ins,19,16); 
+    uint32_t rn_val         = arm_read_register(p,rn);
+    uint16_t register_list  = get_bits(ins,15,0);
+    uint32_t start_address;
+    uint32_t end_address; 
+    uint32_t address; 
+    uint32_t data;
+    int res = 0;
+    int i;
+    int cpt = 0;
+    //conde code !!!!!!!
+
+    for(i = 0; i <= 15; i++ ){
+        if (get_bit(register_list, i)){
+           cpt ++;
+        }        
+    }
+
+    if(pBit){
+        if(u){
+            start_address = rn_val + 4;
+            end_address   = rn_val + (cpt * 4);
+            if(w){
+                rn_val  = rn_val + (cpt * 4);
+            }
+
+        }else{
+            start_address = rn_val - (cpt * 4);
+            end_address   = rn_val - 4 ;
+            if(w){
+                rn_val  = rn_val - (cpt * 4);
+            }
+        }
+    }else{
+         if(u){
+            start_address = rn_val;
+            end_address  = rn_val + (cpt * 4) - 4;
+            if(w){
+                rn_val = rn_val + (cpt * 4);
+            }
+         }else{
+            start_address = rn_val -(cpt * 4) + 4;
+            end_address  = rn_val;
+            if(w){
+                rn_val = rn_val - (cpt * 4);
+            }
+         }
+
+    }
+
+    arm_write_register(p,rn,rn_val);
 
 
-    return UNDEFINED_INSTRUCTION;
+   
+    address = start_address;
+
+    if(l){//load 
+        for(i = 0; i <= 14; i++ ){
+            if (get_bit(register_list, i)){
+                arm_read_word(p,address,&data);
+                arm_write_register(p,i,data);
+                address = address + 4;
+            }
+        }
+
+        if(get_bit(register_list,15)){
+            arm_read_word(p,address,&data);
+            arm_write_register(p,15,data & 0xFFFFFFFE);
+            address = address + 4;
+        }
+
+        res = end_address == (address - 4);
+
+    }else{//store
+
+        for(i = 0; i <= 15; i++ ){
+            if (get_bit(register_list, i)){
+                data = arm_read_register(p,i);
+                arm_write_word(p,address,data);
+                address = address + 4;
+            }        
+        }
+
+        res = end_address == (address - 4);
+
+    }
+    return res;
 }
 
 int arm_coprocessor_load_store(arm_core p, uint32_t ins) {
