@@ -62,7 +62,11 @@ int arm_data_processing_shift(arm_core p, uint32_t ins) {
 				return -1; // UNPREDICTTABLE
 			}
 		}else if( S == 1){
-			arm_write_cpsr(p,(arm_read_cpsr(p) & (0xFFFFFFF0 | nzcv))); // update nzcv flags
+                                printf("nzcv apres : %x\n",nzcv);
+                                uint32_t tmp = arm_read_cpsr(p);
+                                tmp = (tmp & 0x0FFFFFFF);
+                                tmp = (tmp | (nzcv <<28));
+                                arm_write_cpsr(p,tmp); // update nzcv flags
 		}
 	}
 
@@ -83,6 +87,7 @@ int arm_data_processing_immediate_msr(arm_core p, uint32_t ins) {
 		uint32_t shifter_operande  = ror(immed_8, 2 * rotate_imm );
 		
 		uint8_t nzcv = get_bits(arm_read_cpsr(p),31,28);
+                                printf("nzcv avant : %x\n",nzcv);
 
 
 		uint32_t res = operation(p,opcode,Rd,rn_val,shifter_operande, &nzcv,0);
@@ -95,7 +100,12 @@ int arm_data_processing_immediate_msr(arm_core p, uint32_t ins) {
 					return -1; // UNPREDICTTABLE
 				}
 			}else if( S == 1){
-				arm_write_cpsr(p,(arm_read_cpsr(p) & (0xFFFFFFF0 | nzcv))); // update nzcv flags
+                                printf("nzcv apres : %x\n",nzcv);
+                                uint32_t tmp = arm_read_cpsr(p);
+                                tmp = (tmp & 0x0FFFFFFF);
+                                tmp = (tmp | (nzcv <<28));
+                                arm_write_cpsr(p,tmp); // update nzcv flags
+                                
 			}
 		}
     return res;
@@ -121,14 +131,14 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 
 		case 2: //SUB  (Rd := Rn - shifter_operande)
 			val =  (rn - shifter_operande);
-			*nzcv= *nzcv & ((~((~rn & ~shifter_operande) & val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((~((~rn & ~shifter_operande) & val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & (((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val)) >> 31)| 0b1110); // set V flag
 			arm_write_register(p,rd,val);
 			res = 1;
 			break;
 		case 3: //RSB reverse substract
 			val =  (shifter_operande - rn);
-			*nzcv= *nzcv & ((~( (~rn & ~shifter_operande) & val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((~( (~rn & ~shifter_operande) & val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & (((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val)) >> 31)| 0b1110); // set V flag
 			arm_write_register(p,rd,val);
 			res = 1;
@@ -136,7 +146,7 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 
 		case 4:  //ADD
 			val =  (rn + shifter_operande);
-			*nzcv= *nzcv & ((((rn | shifter_operande) & ~val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((((rn | shifter_operande) & ~val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & (((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val)) >> 31)| 0b1110); // set V flag			arm_write_register(p,rd,val);
 			arm_write_register(p,rd,val);
 			res = 1;
@@ -144,7 +154,7 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 
 		case 5 : // ADC
 			val =  (rn + shifter_operande + (*nzcv & (0b0010>>1)));
-			*nzcv= *nzcv & ((((rn | shifter_operande) & ~val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((((rn | shifter_operande) & ~val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & (((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val)) >> 31)| 0b1110); // set V flag
 			arm_write_register(p,rd,val);
 			res = 1;
@@ -152,7 +162,7 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 
 		case 6: // SBC sub with carry
 			val =  (rn - shifter_operande - (*nzcv & (0b0010>>1)));
-			*nzcv= *nzcv & ((~((~rn & ~shifter_operande) & val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((~((~rn & ~shifter_operande) & val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & (((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val)) >> 31)| 0b1110); // set V flag
 			arm_write_register(p,rd,val);
 			res = 1;
@@ -160,7 +170,7 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 
 		case 7: // RSC reverse substract with carry
 			val =  (shifter_operande - rn - (*nzcv & (0b0010>>1)));
-			*nzcv= *nzcv & ((((~rn & ~shifter_operande) & val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((((~rn & ~shifter_operande) & val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & ((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val) >> 31)| 0b1110); // set V flag
 			arm_write_register(p,rd,val);
 			res = 1;
@@ -180,14 +190,14 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 
 		case 10://CMP
 			val =  (rn - shifter_operande);
-			*nzcv= *nzcv & ((~( (~rn & ~shifter_operande) & val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((~( (~rn & ~shifter_operande) & val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & (((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val)) >> 31)| 0b1110); // set V flag
 			res = 1;
 			break;
 
 		case 11://CMN
 			val =  (rn + shifter_operande);
-			*nzcv= *nzcv & ((((rn | shifter_operande) & ~val) >> 30)| 0b1110); // set C flag
+			*nzcv= *nzcv & ((((rn | shifter_operande) & ~val) >> 30)| 0b1101); // set C flag
 			*nzcv= *nzcv & (((((rn & shifter_operande) & ~val) | ((~rn & ~shifter_operande) & val)) >> 31)| 0b1110); // set V flag
 			res = 1;
 			break;
@@ -228,7 +238,7 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 	if (val == 0){ 							// set Z flag
 		*nzcv= (*nzcv | 0b0100); 
 	}else{ 
-		*nzcv= (*nzcv & 0b10111);
+		*nzcv= (*nzcv & 0b1011);
 	}
 	return res;
 

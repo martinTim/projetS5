@@ -83,29 +83,33 @@ int arm_step(arm_core p) {
     printf(" test 1 \n" );
 
     result = arm_execute_instruction(p);
-    if (result)
+    if (!result)
         arm_exception(p, result);
     return result;
 }
 
 int condCode(arm_core p,uint32_t value){
-    uint8_t opcode = (0xF0000000 & value)>>28;
-    uint8_t NZCV = arm_read_cpsr(p)>>28;
+    uint32_t cpsr = arm_read_cpsr(p);
+    uint8_t n = get_bit(cpsr,N);
+    uint8_t z = get_bit(cpsr,Z);
+    uint8_t c = get_bit(cpsr,C);
+    uint8_t v = get_bit(cpsr,V);
+    uint8_t opcode = value>>28;
     switch (opcode){
-      case 0: return (NZCV & 0b0100);   // Z set
-      case 1: return !(NZCV & 0b0100);  // Z clear
-      case 2: return (NZCV & 0b0010);   // C set
-      case 3: return !(NZCV & 0b0010);  // C clear
-      case 4: return (NZCV & 0b1000);  // N set
-      case 5: return !(NZCV & 0b1000);  // N clear
-      case 6: return (NZCV & 0b0001);  // V set
-      case 7: return !(NZCV & 0b001);  // V clear
-      case 8: return ((NZCV & 0b0010) && !(NZCV & 0b0100));  // C set Z clear
-      case 9: return (!(NZCV & 0b0010) || (NZCV & 0b0100));  // C clear or Z set
-      case 10:return (((NZCV & 0b1000)>>3) == (NZCV & 0b0001));  // N == V
-      case 11:return ((NZCV & 0b1000)^(NZCV & 0b0001));  // N != V
-      case 12:return ((((NZCV & 0b1000)>>3) == (NZCV & 0b0001)) && !(NZCV & 0b0100));  // Z clear and N == V
-      case 13:return ((NZCV & 0b0100) || (((NZCV & 0b1000)>>3) == (NZCV & 0b0001))); 
+      case 0: return (z==1);   // Z set
+      case 1: return (z==0);  // Z clear
+      case 2: return (c==1);   // C set
+      case 3: return (c==0);  // C clear
+      case 4: return (n==1);  // N set
+      case 5: return (n==0);  // N clear
+      case 6: return (v==1);  // V set
+      case 7: return (v==0);  // V clear
+      case 8: return ((c==1) && (z==0));  // C set Z clear
+      case 9: return ((c==0) || (z==1));  // C clear or Z set
+      case 10:return (n==v);// N == V
+      case 11:return (n!=v);  // N != V
+      case 12:return ((z==0) && (n==v));// Z clear and N == V
+      case 13:return ((z==1) || (n!=v));  // Z set or N != V
       case 14:return 1;  // toujours vrai
       case 15:return -1;  // aucune idée
       default: return -1; 
