@@ -52,6 +52,8 @@ static int arm_execute_instruction(arm_core p) {
         case 0b000: // traitement données 1 ou LDRH/STRH
             if(get_bit(val_instr,7)==1 && get_bit(val_instr,4)==1) //LDRH et STRH
                 res = arm_load_store(p,val_instr);
+            else if(get_bit(val_instr,20)==0 && get_bit(val_instr,21)==0 && get_bit(val_instr,23)==0 && get_bit(val_instr,24)==1) //MRS
+                move_PSR_to_register(p,val_instr);            
             else
                 res = arm_data_processing_shift(p,val_instr);
             break;
