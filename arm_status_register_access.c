@@ -11,4 +11,5 @@ int move_PSR_to_register(arm_core p, uint32_t ins) {
         } else
             arm_write_register(p, rd, arm_read_cpsr(p));
     }
+    return 1;
 }
