@@ -9,6 +9,7 @@
 #define	ARM_STATUS_REGISTER_ACCESS_H
 #include "arm_core.h"
 #include "util.h"
+#include "trace_location.h"
 
 int move_PSR_to_register(arm_core p, uint32_t ins);
 

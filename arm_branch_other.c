@@ -30,7 +30,6 @@ Contact: Guillaume.Huard@imag.fr
 int arm_branch(arm_core p, uint32_t ins) {
 
     if (condCode(p, ins)) {
-        printf("Z=%d\n",get_bit(arm_read_cpsr(p),Z));
         uint8_t L = get_bit(ins, 24);
         uint8_t mode = get_mode_registers(p);
         uint8_t bit = get_bit(ins, 23);
