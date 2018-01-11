@@ -186,7 +186,7 @@ int operation(arm_core p, uint8_t operande, uint32_t rd, uint32_t rn, uint32_t s
 			break;
 
 		case 5 : // ADC
-			val =  (rn + shifter_operande + (*nzcv & (0b0010>>1)));
+			val =  (rn + shifter_operande + get_bit(*nzcv,1));
 			if(val<rn || val<shifter_operande){          // set C flag
                             *nzcv=set_bit(*nzcv,1);
                         }else{

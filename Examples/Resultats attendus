@@ -1,0 +1,19 @@
+example 1
+R	valeur
+0	0xffffffff
+1	0xf000000f
+2	0x5
+
+
+example 10
+R	valeur
+0	0xab
+1	0x80000055
+2	0xffe00000
+3	0x7fe00055
+4	0x800000ff
+5	0x00000055
+
+
+example 11
+R	valeur
