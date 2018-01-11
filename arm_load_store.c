@@ -50,7 +50,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
           printf("load / store test 1 rn : %x \n",rn);
 
         if(!pBit && !w ){ // 1ER CAS
-            /*if(rn == 16){
+            /*if(rn == 15){
                 return UNDEFINED_INSTRUCTION;
             }*/
             address = rn_val;
@@ -74,7 +74,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 
       /*  if( pBit && !w ) {
             if(rn == 15){
-                address +=8; // UNPREDICTTABLE           
+                address +=8;      
             }        
         }*/
         
@@ -89,7 +89,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
         offset = arm_read_register(p,rm);
         if(!pBit && !w ){ // 1ER CAS
          /*   if(rn == 15 || rm == 15) {
-               return -1; // UNPREDICTTABLE
+               return UNDEFINED_INSTRUCTION; // UNPREDICTABLE
             } */
             address = rn_val;  
 
@@ -107,14 +107,14 @@ int arm_load_store(arm_core p, uint32_t ins) {
         //CONDCODE ici
         if(pBit && w ){ // 2EME CAS
          /*   if(rn == 15 || rm == 15) {
-               return -1; // UNPREDICTTABLE
+               return UNDEFINED_INSTRUCTION; // UNPREDICTABLE
             }*/
             arm_write_register(p,rn,address);   
         }
 
         /*if( pBit && !w ) { // 3EME CAS
             if(rm  == 15){
-                return -1; // UNPREDICTTABLE     
+                return UNDEFINED_INSTRUCTION; // UNPREDICTABLE     
             }
             if(rn == 15 ){
                 address += 8;
