@@ -13,7 +13,7 @@ main:
     add r0, r1, r0, lsl r3
     mov r1, #0x2000
     str r0, [r1]
-    ldrb r2, [r1]
+    ldrb r4, [r1]
+    ldrh r2, [r1]
     add r1, r1, #3
-    ldrb r3, [r1]
     swi 0x123456

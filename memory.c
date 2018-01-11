@@ -63,7 +63,7 @@ int memory_read_byte(memory mem, uint32_t address, uint8_t *value) {
 }
 
 int memory_read_half(memory mem, uint32_t address, uint16_t *value) {
-  if(mem->size < address - sizeof(uint16_t)) {
+  if(address <=  (mem->size - sizeof(uint16_t) ) ) {
     uint16_t result;
     if( mem->is_big_endian){
       result = mem->memoire[address]<<8 | mem->memoire[address+1];
