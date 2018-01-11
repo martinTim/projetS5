@@ -7,6 +7,8 @@ main:
     ldr r2, =fin
     ldr r5, [r1, +r4, lsl #2]
     ldmia r1!, {r6, r7}
+    stmia r1, {r6,r7}
+
     swi 0x123456
 .data
 donnee:

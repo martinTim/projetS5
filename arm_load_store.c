@@ -45,9 +45,9 @@ int arm_load_store(arm_core p, uint32_t ins) {
     printf("load / store \n");
 
 
-    if(!imm_offset && h){// Feuille 1
+    if(!imm_offset && h ) {// Feuille 1
      printf("load / store test 1 \n");
-          printf("load / store test 1 rn : %x \n",rn);
+    printf("load / store test 1 rn : %x \n",rn);
 
         if(!pBit && !w ){ // 1ER CAS
             /*if(rn == 15){
@@ -124,6 +124,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
 
 
     if(!h){//LOAD OUR STORE HALF WORD
+
         uint16_t data;
         printf("load / str un 1/2 mot  \n ");
         if(l){//load
