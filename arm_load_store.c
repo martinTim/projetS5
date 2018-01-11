@@ -29,7 +29,7 @@ Contact: Guillaume.Huard@imag.fr
 int arm_load_store(arm_core p, uint32_t ins) {
     uint8_t pBit = get_bit(ins,24);
     uint8_t w = get_bit(ins,21);
- 
+
     uint8_t imm_offset = get_bit(ins,25);
     uint8_t u = get_bit(ins,23);
     uint8_t l = get_bit(ins,20);
@@ -41,9 +41,9 @@ int arm_load_store(arm_core p, uint32_t ins) {
     uint8_t rd = get_bits(ins,15,12); 
     uint32_t offset = get_bits(ins,11,0);
     uint32_t address =0 ;
-    
+
     printf("load / store \n");
-   
+
 
     if(!imm_offset && h){// Feuille 1
      printf("load / store test 1 \n");
@@ -61,8 +61,6 @@ int arm_load_store(arm_core p, uint32_t ins) {
         }else{
             address = rn_val - offset;
         }
-      
-    //CONDCODE ici
 
         if(pBit && w ){ // 2EME CAS
            /* if(rn == 15){
@@ -77,8 +75,8 @@ int arm_load_store(arm_core p, uint32_t ins) {
                 address +=8;      
             }        
         }*/
-        
-     
+
+
 
     }else{// feuille 2 ET 3
         printf("load / store test 2\n ");
@@ -104,7 +102,6 @@ int arm_load_store(arm_core p, uint32_t ins) {
         }
 
 
-        //CONDCODE ici
         if(pBit && w ){ // 2EME CAS
          /*   if(rn == 15 || rm == 15) {
                return UNDEFINED_INSTRUCTION; // UNPREDICTABLE
@@ -122,7 +119,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
         }*/
 
     }
-            printf(" offset ---- %x \n",offset);
+    printf(" offset ---- %x \n",offset);
 
 
 
@@ -184,7 +181,6 @@ int arm_load_store_multiple(arm_core p, uint32_t ins) {
     int res = 0;
     int i;
     int cpt = 0;
-    //conde code !!!!!!!
 
     for(i = 0; i <= 15; i++ ){
         if (get_bit(register_list, i)){

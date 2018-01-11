@@ -1,5 +1,4 @@
 #!/bin/bash
-
-
-arm-none-eabi-gdb -se $1 --command=command.gdb
+xterm -hold -e  ./sim.sh &
+arm-none-eabi-gdb -se "Examples/example"$1 --command=./command.gdb
 

@@ -1,3 +1,2 @@
-target remote :45555
-
+target remote localhost:45555
 load
