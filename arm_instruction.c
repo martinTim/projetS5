@@ -41,12 +41,11 @@ static int arm_execute_instruction(arm_core p) {
 
 
     res = condCode(p,val_instr);
-    if(!res  ){
+    if(!res){
         printf(" test error condCode\n" );
         return -1;
         }
         printf(" test 3 \n" );
-
 
     uint8_t code = get_bits(val_instr,27,25);
     switch(code){
@@ -118,6 +117,6 @@ int condCode(arm_core p,uint32_t value){
       case 13:return ((z==1) || (n!=v));  // Z set or N != V
       case 14:return 1;  // toujours vrai
       case 15:return -1;  // aucune idée
-      default: return -1; 
+      default: return -1;
     }
 }

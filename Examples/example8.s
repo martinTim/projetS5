@@ -2,10 +2,10 @@
 .text
 
 main:
-    mov r0, #1
-    mov r1, r0, lsl #30
-    adds r0, r1, r0, lsl #30
-    mrs r0,CPSR
+    mov r0, #500
+	ldr r15,[r0]
+	ldrb r13,[r0]
+	mov r0, #1
     
 
 end:

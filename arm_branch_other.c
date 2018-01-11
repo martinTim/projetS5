@@ -29,36 +29,34 @@ Contact: Guillaume.Huard@imag.fr
 
 int arm_branch(arm_core p, uint32_t ins) {
 
-    if (condCode(p, ins)) {
-        uint8_t L = get_bit(ins, 24);
-        uint8_t mode = get_mode_registers(p);
-        uint8_t bit = get_bit(ins, 23);
-        uint32_t target_address;
-        uint32_t pc = arm_read_register(p, 15);
+    uint8_t L = get_bit(ins, 24);
+    uint8_t mode = get_mode_registers(p);
+    uint8_t bit = get_bit(ins, 23);
+    uint32_t target_address;
+    uint32_t pc = arm_read_register(p, 15);
 
-        //In case L=1 we have to preserve the return address
-        if (L == 1) {
-            if (mode == USR) {
-                arm_write_usr_register(p, 14, pc - 0x4);
-            } else if (mode == SYS) {
-                arm_write_register(p, 14, pc - 0x4);
-            } else
-                arm_write_register(p, 14, pc - 0x4); //Apparemment on est dans le mode superviseur
-        }
+    //In case L=1 we have to preserve the return address
+    if (L == 1) {
+        if (mode == USR) {
+            arm_write_usr_register(p, 14, pc - 0x4);
+        } else if (mode == SYS) {
+            arm_write_register(p, 14, pc - 0x4);
+        } else
+            arm_write_register(p, 14, pc - 0x4); //Apparemment on est dans le mode superviseur
+    }
 
-        //Sign extending to 30 bits
-        if (bit) {
-            target_address = 0b111111000000000000000000000000 | get_bits(ins, 23, 0);
-        } else {
-            target_address = 0b000000000000000000000000000000 | get_bits(ins, 23, 0);
-        }
+    //Sign extending to 30 bits
+    if (bit) {
+        target_address = 0b111111000000000000000000000000 | get_bits(ins, 23, 0);
+    } else {
+        target_address = 0b000000000000000000000000000000 | get_bits(ins, 23, 0);
+    }
 
-        target_address = target_address << 2;
-        pc = pc + target_address;
-        arm_write_register(p, 15, pc);
+    target_address = target_address << 2;
+    pc = pc + target_address;
+    arm_write_register(p, 15, pc);
 
-        return 1;
-    } else return 1; //Condition not satisfied, no branch done.
+    return 1;
 }
 
 int arm_coprocessor_others_swi(arm_core p, uint32_t ins) {
