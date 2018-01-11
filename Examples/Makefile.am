@@ -6,11 +6,7 @@ AM_LDFLAGS=-nostdlib -T $(srcdir)/linker_script -n --entry main
 AM_LDFLAGS+=-Wl,-EB
 
 if HAVE_ARM_COMPILER
-<<<<<<< HEAD
 noinst_PROGRAMS=example1 example2 example3 example4 example5 example6 example7 example8 example9 example10 example11 example12 insertion_sort
-=======
-noinst_PROGRAMS=example1 example2 example3 example4 example5 example6 example7 example8 example9 insertion_sort
->>>>>>> bbe39c348c619905d1f1c03d6e7f71a3ef09f44b
 
 all-am: $(PROGS)
 endif
@@ -24,13 +20,10 @@ example6_SOURCES=example6.s
 example7_SOURCES=example7.s
 example8_SOURCES=example8.s
 example9_SOURCES=example9.s
-<<<<<<< HEAD
 example10_SOURCES=example10.s
 example11_SOURCES=example11.s
 example12_SOURCES=example12.s
 
-=======
->>>>>>> bbe39c348c619905d1f1c03d6e7f71a3ef09f44b
 insertion_sort_SOURCES=insertion_sort.c
 
 EXTRA_DIST=linker_script
