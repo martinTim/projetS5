@@ -23,5 +23,12 @@ R	valeur
 Ici on teste une suite d'instructions bit-à-bit, les deux types de decallage, et la rotation.
 
 
-example 11
+example 12
 R	valeur
+0	0x00000020
+1	0xffffffff
+2	0xffffff0f
+3	0xffffffff
+4	0x000000ef
+
+On teste ici les instructions de comparaison tst et cmp et les soustractions avec carry sbc rsc.
