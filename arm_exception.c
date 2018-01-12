@@ -34,7 +34,7 @@ void arm_exception(arm_core p, unsigned char exception) {
     /* We only support RESET initially */
     /* Semantics of reset interrupt (ARM manual A2-18) */
     if (exception == RESET) {
-        printf("EXCEPTION! cpsr = 1d3");
+//        printf("EXCEPTION! cpsr = 1d3\n");
         arm_write_cpsr(p, 0x1d3 | Exception_bit_9);
 	arm_write_usr_register(p, 15, 0);
     }

@@ -3,7 +3,7 @@
 
 main:
     mov r0, #0xFFFFFFFF
-     r1,r1,r0
+    add r1,r1,r0
 	
 
 

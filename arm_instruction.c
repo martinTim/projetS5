@@ -32,20 +32,17 @@ Contact: Guillaume.Huard@imag.fr
 static int arm_execute_instruction(arm_core p) {
     uint32_t val_instr;
     int res;
-      printf(" test 2 \n" );
     res =  arm_fetch(p,&val_instr);
     if(res != 0 ){
-      printf(" test 4 %d \n", res );
       return -1;
     }
 
 
     res = condCode(p,val_instr);
     if(!res){
-        printf(" test error condCode\n" );
+        printf("Condition pas satisfaite\n");
         return -1;
         }
-        printf(" test 3 \n" );
 
     uint8_t code = get_bits(val_instr,27,25);
     switch(code){
@@ -85,8 +82,7 @@ static int arm_execute_instruction(arm_core p) {
 
 int arm_step(arm_core p) {
     int result;
-    printf(" test 1 \n" );
-
+    printf("------------------------------------------------------------\n");
     result = arm_execute_instruction(p);
     if (!result)
         arm_exception(p, result);

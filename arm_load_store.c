@@ -42,12 +42,7 @@ int arm_load_store(arm_core p, uint32_t ins) {
     uint32_t offset = get_bits(ins,11,0);
     uint32_t address =0 ;
 
-    printf("load / store \n");
-
-
     if(!imm_offset && h ) {// Feuille 1
-     printf("load / store test 1 \n");
-    printf("load / store test 1 rn : %x \n",rn);
 
         if(!pBit && !w ){ // 1ER CAS
             /*if(rn == 15){
@@ -79,7 +74,6 @@ int arm_load_store(arm_core p, uint32_t ins) {
 
 
     }else{// feuille 2 ET 3
-        printf("load / store test 2\n ");
         uint8_t shift_imm = get_bits(ins,11,7);
         uint32_t val_shift = arm_read_register(p,shift_imm);
         uint8_t shift_type = get_bits(ins,6,5);
@@ -119,25 +113,23 @@ int arm_load_store(arm_core p, uint32_t ins) {
         }*/
 
     }
-    printf(" offset ---- %x \n",offset);
+//    printf(" offset ---- %x \n",offset);
 
 
 
     if(!h){//LOAD OUR STORE HALF WORD
 
         uint16_t data;
-        printf("load / str un 1/2 mot  \n ");
         if(l){//load
             arm_read_half(p,address,&data);
             arm_write_register(p,rd,data);
         }else{//store
-            printf(" address ---- %x \n",address);
+//            printf(" address ---- %x \n",address);
             data =  arm_read_register(p,rd);
             arm_write_half(p,address,data);
         }
 
     }else if(b){//LOAD OU STORE 1 octet 
-        printf("load / str un octet \n ");
         uint8_t data; 
 
         if(l){//load
@@ -145,12 +137,10 @@ int arm_load_store(arm_core p, uint32_t ins) {
             arm_write_register(p,rd,data);
         }else{//store
             data =  arm_read_register(p,rd);
-        //     printf(" st ---- %d\n",data);
             arm_write_byte(p,address,data);
         }
 
     }else{//LOAD OU STORE 1 MOT
-    //    printf("load / str un mot \n ");
         uint32_t data;
         if(l){//load
             arm_read_word(p,address,&data);
