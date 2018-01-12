@@ -5,5 +5,5 @@ main:
     mov r0, #4
     mov r1, #1024
     str r0, [r1]
-    ldrb r2, [r1]
+    ldr r2, [r1]
     swi 0x123456
