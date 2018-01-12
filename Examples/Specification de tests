@@ -1,0 +1,34 @@
+example 1
+R	valeur
+0	0xffffffff
+1	0x5
+	
+
+Dans ce test, on a une boucle qui decremente le r0, auquel on a donne la valeur 5, en incrementant le r1 à chaque fois.
+Après la sortie de la boucle, on fait un mvn avec la valeur 0 au r0.
+Comme ça on teste les branchements, (conditionelle et avec sauvegarde d'adresse de retour) et les instructions mov et mvn.
+
+
+example 10
+R	valeur
+0	0xab
+1	0x80000055
+2	0xffe00000
+3	0x7fe00055
+4	0x800000ff
+5	0x00000055
+6	0x00005500
+7	0x0800000f
+
+Ici on teste une suite d'instructions bit-à-bit, les deux types de decallage, et la rotation.
+
+
+example 12
+R	valeur
+0	0x00000020
+1	0xffffffff
+2	0xffffff0f
+3	0xffffffff
+4	0x000000ef
+
+On teste ici les instructions de comparaison tst et cmp et les soustractions avec carry sbc rsc.
